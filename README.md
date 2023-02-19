@@ -1,5 +1,14 @@
 # PowerBI 
 
+## Dataflows
+
+## Datasets
+
+## Gateways
+
+## Workspaces and App
+
+## Functions
 ### Cumulative 
 Cumulative  = Calculate(sum(revenue),filter(table, table[revenue]>=Earlier(table(revenue)))
 

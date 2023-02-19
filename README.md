@@ -19,6 +19,11 @@ e.g. 7 Days of Sales
   var startdate = latest-7 
 Return
   CALCULATE([Customers], FILTER(ALL('Date Dimension'[Date]), 'Date Dimension'[Date] <= Latest &&  'Date Dimension'[Date] > startdate))
+  
+ Last 7 days of Sales
+ 
+ 7_sales = CALCULATE( SUM('table'[sales]),'table'[date_of_sales]>=TODAY()-14)
+  
 
 ### Top N months
 
@@ -31,13 +36,9 @@ RollingAvg =
 
   Var NumDays = 14
 
-  Var rollingsum_goal = 
+  Var rollingsum_goal =   CALCULATE(SUM('table'[goals]), DATESINPERIOD('Dim - Date'[Date],LASTDATE('Dim - Date'[Date]),-NumDays,DAY))
   
-  CALCULATE(SUM('table'[goals]), DATESINPERIOD('Dim - Date'[Date],LASTDATE('Dim - Date'[Date]),-NumDays,DAY))
-  
-  Var rollingsum_chances = 
-  
-  CALCULATE(SUM('table'[chances]), DATESINPERIOD('Dim - Date'[Date],LASTDATE('Dim - Date'[Date]),-NumDays,DAY))
+  Var rollingsum_chances = CALCULATE(SUM('table'[chances]), DATESINPERIOD('Dim - Date'[Date],LASTDATE('Dim - Date'[Date]),-NumDays,DAY))
 
 Return 
   
@@ -45,6 +46,10 @@ Return
 
 
 ### Current_months
+
+## Previous Months 
+
+Previous Months = CALCULATE([Sales],PREVIOUSMONTH('Dim - Date'[Date]))
 
 ### UserRelationshiop
 Use this function when two tables currently dont have a relationship

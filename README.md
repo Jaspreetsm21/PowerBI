@@ -1,4 +1,4 @@
-# PowerBI 
+# PowerBI - Guide
 
 ## Dataflows
 
@@ -9,6 +9,13 @@
 ## Workspaces and App
 
 ## Functions
+
+### Top N months
+
+### Current_months
+
+### Row Total
+
 ### Cumulative 
 Cumulative  = Calculate(sum(revenue),filter(table, table[revenue]>=Earlier(table(revenue)))
 

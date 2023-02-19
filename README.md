@@ -10,11 +10,54 @@
 
 ## Functions
 
+# Dates
+
+### N Days
+e.g. 7 Days of Sales
+7 Days = 
+  var Latest = max('Date Dimension'[Date])
+  var startdate = latest-7 
+Return
+  CALCULATE([Customers], FILTER(ALL('Date Dimension'[Date]), 'Date Dimension'[Date] <= Latest &&  'Date Dimension'[Date] > startdate))
+
 ### Top N months
+
+Allows you to filter out the last n months 
+
+Top N Months = DATEDIFF('Date Dimension'[Date],TODAY(),MONTH)
+
+## Rolling Avearge
+RollingAvg = 
+
+  Var NumDays = 14
+
+  Var rollingsum_goal = 
+  
+  CALCULATE(SUM('table'[goals]), DATESINPERIOD('Dim - Date'[Date],LASTDATE('Dim - Date'[Date]),-NumDays,DAY))
+  
+  Var rollingsum_chances = 
+  
+  CALCULATE(SUM('table'[chances]), DATESINPERIOD('Dim - Date'[Date],LASTDATE('Dim - Date'[Date]),-NumDays,DAY))
+
+Return 
+  
+  DIVIDE(rollingsum_goal,rollingsum_chances)
+
 
 ### Current_months
 
+### UserRelationshiop
+Use this function when two tables currently dont have a relationship
+
+Requests = calculate(DISTINCTCOUNT('Table[ID]),USERELATIONSHIP('Table'[Requested Date],'Dim - Date'[Date]))
+
+Dax Calculate formuale = CALCULATE(SUM('Table'[Total]),FILTER('Table','Table'[ORDER_STATUS]="Live"))
+
+
+
 ### Row Total
+
+row_total = DIVIDE([total],CALCULATE([total],ALL('Table'[Category])))
 
 ### Cumulative 
 Cumulative  = Calculate(sum(revenue),filter(table, table[revenue]>=Earlier(table(revenue)))

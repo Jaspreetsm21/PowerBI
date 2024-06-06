@@ -74,6 +74,24 @@ Rank = Rankx(table,table(revenue))
 
 
 ### Create a New table from another table
+
+### Switch 
+
+type_Group = 
+VAR MySelection =
+SELECTEDVALUE ('Fees Flag'[Type] )
+RETURN
+SWITCH (
+TRUE (),
+MySelection = "Counts Non Discount", [Non_Disc_Cust],
+MySelection = "Counts Discount", [Disc_Cust],
+MySelection = "Avg Upfront Non Discount", [Avg_Annual_fees],
+MySelection = "Avg Upfront Discount", [Avg_Disc_fees],
+MySelection = "Avg Monthly Non Discount", [non_disc_avg_monthly],
+MySelection = "Avg Monthly Discount", [avg_disc_monthly_fees],
+0
+)
+
 e.g. selecting certain columns from stock to create a new table name is Turnover.
 
 Turnover = Selectcolumns(stock,

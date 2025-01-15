@@ -92,9 +92,50 @@ MySelection = "Avg Monthly Discount", [avg_disc_monthly_fees],
 0
 )
 
+
+
+## Organsation Level
+
+# Path Length (number of People above them)
+
+Path Length = PATHLENGTH('fact(Employees) Higher'[path])
+path = PATH('fact(Employees) Higher'[BW ID],'fact(Employees) Higher'[Manger_BW])
+
+Organization Level 1 = 
+VAR EmployeeID = PATHITEM('fact(Employees) Higher'[path], 1 #(level 1,2,3,4), 1)
+VAR EmployeeName = LOOKUPVALUE(
+    'fact(Employees) Higher'[Employee_name],
+    'fact(Employees) Higher'[BW ID], EmployeeID
+)
+VAR EmployeePosition = CALCULATE(
+    FIRSTNONBLANK('fact(Employees) Higher'[Employee_Position], 1),
+    FILTER(
+        'fact(Employees) Higher',
+        'fact(Employees) Higher'[Employee_name] = EmployeeName
+    )
+)
+RETURN
+IF(NOT(ISBLANK(EmployeeName)),IF(
+    ISBLANK(EmployeePosition),
+    EmployeeName,
+    EmployeeName & " : " & EmployeePosition
+),BLANK())
+
 e.g. selecting certain columns from stock to create a new table name is Turnover.
 
 Turnover = Selectcolumns(stock,
                          "SKU-ID",stock[SKU-ID],
                          "Description",stock[Description],
                          "2021_Start_stock",stock[2021_start_stock])
+
+
+Organization Level 4 = 
+Var EmployeeName = LOOKUPVALUE(
+    'fact(Employees) Higher'[Employee_name],
+    'fact(Employees) Higher'[BW ID],
+                    PATHITEM(
+                            'fact(Employees) Higher'[path],
+                            4,
+                            1))
+RETURN
+IF(NOT(ISBLANK(EmployeeName)), EmployeeName, BLANK())

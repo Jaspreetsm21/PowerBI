@@ -139,3 +139,30 @@ Var EmployeeName = LOOKUPVALUE(
                             1))
 RETURN
 IF(NOT(ISBLANK(EmployeeName)), EmployeeName, BLANK())
+
+# API in Power BI query
+
+= (DT as text) as table=>
+let
+    Source = Json.Document(Web.Contents("URL="&DT&")),
+    #"Converted to Table" = Table.FromRecords({Source}),
+    #"Expanded result" = Table.ExpandListColumn(#"Converted to Table", "result"),
+    #"Expanded result1" = Table.ExpandRecordColumn(#"Expanded result", "result", {"u_category", "number", "opened_at", "hr_service", "assignment_group", "u_subcategory", "opened_by", "work_end", "hr_profile.user.u_global_hr_id", "state", "topic_category", "approval_history"}, {"result.u_category", "result.number", "result.opened_at", "result.hr_service", "result.assignment_group", "result.u_subcategory", "result.opened_by", "result.work_end", "result.hr_profile.user.u_global_hr_id", "result.state", "result.topic_category", "result.approval_history"}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Expanded result1",{{"result.u_category", type text}, {"result.number", type text}, {"result.opened_at", type datetime}, {"result.hr_service", type text}, {"result.assignment_group", type text}, {"result.u_subcategory", type text}, {"result.opened_by", type text}, {"result.work_end", type datetime}, {"result.hr_profile.user.u_global_hr_id", Int64.Type}, {"result.state", type text}, {"result.topic_category", type text}}),
+    #"Extracted Date" = Table.TransformColumns(#"Changed Type",{{"result.opened_at", DateTime.Date, type date}, {"result.work_end", DateTime.Date, type date}}),
+    #"Sorted Rows" = Table.Sort(#"Extracted Date",{{"result.opened_at", Order.Descending}})
+in
+    #"Sorted Rows"
+
+
+## Second table in query
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMjIwMtY1MAQipVgdMNcElWsK48YCAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"API Date" = _t]),
+    #"Added Custom" = Table.AddColumn(Source, "Custom", each #"ServiceNow Function"([API Date])),
+    #"Expanded Custom" = Table.ExpandTableColumn(#"Added Custom", "Custom", {"result.u_category", "result.number", "result.opened_at", "result.hr_service", "result.assignment_group", "result.u_subcategory", "result.opened_by", "result.work_end", "result.hr_profile.user.u_global_hr_id", "result.state", "result.topic_category", "result.approval_history"}, {"Custom.result.u_category", "Custom.result.number", "Custom.result.opened_at", "Custom.result.hr_service", "Custom.result.assignment_group", "Custom.result.u_subcategory", "Custom.result.opened_by", "Custom.result.work_end", "Custom.result.hr_profile.user.u_global_hr_id", "Custom.result.state", "Custom.result.topic_category", "Custom.result.approval_history"}),
+    #"Removed Columns" = Table.RemoveColumns(#"Expanded Custom",{"API Date"}),
+    #"Grouped Rows" = Table.Group(#"Removed Columns", {"Custom.result.number", "Custom.result.u_category", "Custom.result.opened_at", "Custom.result.hr_service", "Custom.result.assignment_group", "Custom.result.u_subcategory", "Custom.result.opened_by", "Custom.result.work_end", "Custom.result.hr_profile.user.u_global_hr_id", "Custom.result.state", "Custom.result.topic_category", "Custom.result.approval_history"}, {{"Count", each Table.RowCount(_), Int64.Type}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Grouped Rows",{{"Custom.result.number", "result.number"}, {"Custom.result.u_category", "result.u_category"}, {"Custom.result.opened_at", "result.opened_at"}, {"Custom.result.hr_service", "result.hr_service"}, {"Custom.result.assignment_group", "result.assignment_group"}, {"Custom.result.u_subcategory", "result.u_subcategory"}, {"Custom.result.opened_by", "result.opened_by"}, {"Custom.result.work_end", "result.work_end"}, {"Custom.result.hr_profile.user.u_global_hr_id", "result.hr_profile.user.u_global_hr_id"}, {"Custom.result.state", "result.state"}, {"Custom.result.topic_category", "result.topic_category"}, {"Custom.result.approval_history", "result.approval_history"}}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"result.opened_at", type date}, {"result.work_end", type date}})
+in
+    #"Changed Type"
